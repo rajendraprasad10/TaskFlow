@@ -33,13 +33,13 @@ pipeline {
         // AWS ECR
         // =====================================================
 
-        AWS_REGION = "ap-south-1"
+        // AWS_REGION = "ap-south-1"
 
-        AWS_ACCOUNT_ID = "928341811849"
+        // AWS_ACCOUNT_ID = "928341811849"
 
-        ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        // ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
-        ECR_REPOSITORY = "cicd-demo"
+        // ECR_REPOSITORY = "cicd-demo"
 
         // GitHub repository URL
         REPOSITORY_URL = 'https://github.com/rajendraprasad10/TaskFlow.git'
