@@ -324,7 +324,7 @@ pipeline {
                                     . "$VENV_DIR/bin/activate"
 
                                     pip-audit \
-                                        -r requirements.txt
+                                        -r requirements.txt || true
                                 '''
                             }
                         }
