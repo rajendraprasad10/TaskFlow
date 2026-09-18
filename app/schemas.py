@@ -8,6 +8,7 @@ class TaskBase(BaseModel):
         max_length=200,
     )
 
+
     description: str | None = None
 
     completed: bool = False

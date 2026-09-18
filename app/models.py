@@ -13,6 +13,7 @@ class Task(Base):
         nullable=False,
     )
 
+
     description = Column(
         Text,
         nullable=True,

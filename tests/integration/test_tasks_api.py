@@ -127,6 +127,7 @@ def test_get_nonexistent_task():
 
     assert response.status_code == 404
 
+
     assert response.json() == {
         "detail": "Task not found"
     }

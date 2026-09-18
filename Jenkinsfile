@@ -120,7 +120,7 @@ pipeline {
                     # CREATE VIRTUAL ENVIRONMENT
                     # =========================================
 
-                    if [ ! -d "$VENV_DIR" ]; then
+                    if [ ! -f "$VENV_DIR/bin/activate" ]; then
 
                         echo "Creating virtual environment:"
                         echo "$VENV_DIR"
