@@ -22,7 +22,6 @@ def create_task(
     return db_task
 
 
-
 def get_task(
     db: Session,
     task_id: int,
