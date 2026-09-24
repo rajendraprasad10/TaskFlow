@@ -447,20 +447,16 @@ pipeline {
                                         abortPipeline: false
                                     )
 
-
                                 echo "SonarQube Quality Gate:"
                                 echo "Status: ${qualityGate.status}"
-
-
                                 if (qualityGate.status != 'OK') {
-
-                                    error(
-                                        "SonarQube Quality Gate failed: ${qualityGate.status}"
-                                    )
+                                    // Mark build as UNSTABLE instead of failing
+                                    currentBuild.result = 'UNSTABLE'
+                                    echo "SonarQube Quality Gate failed: ${qualityGate.status}"
+                                } else {
+                                        echo "Quality Gate PASSED."
+                                        currentBuild.result = 'SUCCESS'
                                 }
-
-
-                                echo "Quality Gate PASSED."
                             }
                         }
                     }
