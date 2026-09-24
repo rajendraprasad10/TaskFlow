@@ -583,53 +583,53 @@ pipeline {
                 // 4.5 PUSH TO AWS ECR
                 // =================================================
 
-                stage('Push to AWS ECR') {
+                // stage('Push to AWS ECR') {
 
-                    steps {
+                //     steps {
 
-                        echo "Pushing image to AWS ECR..."
+                //         echo "Pushing image to AWS ECR..."
 
-                        withAWS(
-                            credentials:
-                                'aws-cicd-demo-user-creds',
-                            region:
-                                "${AWS_REGION}"
-                        ) {
+                //         withAWS(
+                //             credentials:
+                //                 'aws-cicd-demo-user-creds',
+                //             region:
+                //                 "${AWS_REGION}"
+                //         ) {
 
-                            sh """
+                //             sh """
 
-                                set -e
-
-
-                                echo "Logging into AWS ECR..."
-
-                                aws ecr get-login-password \
-                                    --region ${AWS_REGION} |
-                                docker login \
-                                    --username AWS \
-                                    --password-stdin \
-                                    ${ECR_REGISTRY}
+                //                 set -e
 
 
-                                echo "Tagging Docker image..."
+                //                 echo "Logging into AWS ECR..."
 
-                                docker tag \
-                                    ${env.IMAGENAME} \
-                                    ${ECR_REGISTRY}/${ECR_REPOSITORY}:${env.VERSION}
-
-
-                                echo "Pushing Docker image..."
-
-                                docker push \
-                                    ${ECR_REGISTRY}/${ECR_REPOSITORY}:${env.VERSION}
+                //                 aws ecr get-login-password \
+                //                     --region ${AWS_REGION} |
+                //                 docker login \
+                //                     --username AWS \
+                //                     --password-stdin \
+                //                     ${ECR_REGISTRY}
 
 
-                                echo "Image pushed successfully."
+                //                 echo "Tagging Docker image..."
 
-                            """
-                        }
-                    }
-                }
+                //                 docker tag \
+                //                     ${env.IMAGENAME} \
+                //                     ${ECR_REGISTRY}/${ECR_REPOSITORY}:${env.VERSION}
+
+
+                //                 echo "Pushing Docker image..."
+
+                //                 docker push \
+                //                     ${ECR_REGISTRY}/${ECR_REPOSITORY}:${env.VERSION}
+
+
+                //                 echo "Image pushed successfully."
+
+                //             """
+                //         }
+                //     }
+                // }
 
 
                 // =================================================
