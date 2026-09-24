@@ -775,9 +775,9 @@ pipeline {
 
                 echo "Cleaning Docker authentication..."
 
-                sh """
-                    docker logout ${ECR_REGISTRY} || true
-                """
+                // sh """
+                //     docker logout ${ECR_REGISTRY} || true
+                // """
             }
 
 
