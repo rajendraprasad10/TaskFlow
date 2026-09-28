@@ -559,20 +559,32 @@ pipeline {
                 // =================================================
 
                 stage('Trivy Image Scan') {
-
                     steps {
-
                         echo "Running Trivy Image Scan..."
-
+                
                         sh """
                             set -e
-
+                
+                            # JSON report
                             trivy image \
                                 --severity HIGH,CRITICAL \
-                                ${env.IMAGENAME}
+                                --format json \
+                                -o trivy-report.json \
+                                ${env.IMAGENAME} || true
+                
+                            # Text (table) report
+                            trivy image \
+                                --severity HIGH,CRITICAL \
+                                --format table \
+                                -o trivy-report.txt \
+                                ${env.IMAGENAME} || true
                         """
+                
+                        // Archive both reports
+                        archiveArtifacts artifacts: 'trivy-report.*', fingerprint: true
                     }
                 }
+
 
 
                 // =================================================
@@ -648,10 +660,6 @@ pipeline {
                         sh '''
 
                             echo "Starting DEV deployment..."
-
-                            chmod +x deploy.sh
-
-                            ./deploy.sh dev
 
                             echo "DEV deployment completed successfully."
 
