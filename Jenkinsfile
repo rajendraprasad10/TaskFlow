@@ -33,13 +33,13 @@ pipeline {
         // AWS ECR
         // =====================================================
 
-        // AWS_REGION = "ap-south-1"
+        AWS_REGION = "ap-south-1"
 
-        // AWS_ACCOUNT_ID = "928341811849"
+        AWS_ACCOUNT_ID = "928341811849"
 
-        // ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
+        ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
-        // ECR_REPOSITORY = "cicd-demo"
+        ECR_REPOSITORY = "cicd-taskflow"
 
         // GitHub repository URL
         REPOSITORY_URL = 'https://github.com/rajendraprasad10/TaskFlow.git'
@@ -472,13 +472,8 @@ pipeline {
         stage('Develop CI/CD') {
 
             when {
-
-                expression {
-
-                    return env.BRANCH_NAME == 'develop'
-                }
+                 expression { env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'main' }
             }
-
 
             stages {
 
@@ -559,73 +554,84 @@ pipeline {
                 // =================================================
 
                 stage('Trivy Image Scan') {
-
                     steps {
-
                         echo "Running Trivy Image Scan..."
 
                         sh """
                             set -e
 
+                            # JSON report
                             trivy image \
                                 --severity HIGH,CRITICAL \
-                                ${env.IMAGENAME}
+                                --format json \
+                                -o trivy-report.json \
+                                ${env.IMAGENAME} || true
+
+                            # Text (table) report
+                            trivy image \
+                                --severity HIGH,CRITICAL \
+                                --format table \
+                                -o trivy-report.txt \
+                                ${env.IMAGENAME} || true
                         """
+
+                        // Archive both reports
+                        archiveArtifacts artifacts: 'trivy-report.*', fingerprint: true
                     }
                 }
+
 
 
                 // =================================================
                 // 4.5 PUSH TO AWS ECR
                 // =================================================
 
-                // stage('Push to AWS ECR') {
+                stage('Push to AWS ECR') {
+                    when {
+                        expression { env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'main' }
+                    }
+                    
+                    steps {
 
-                //     steps {
+                        echo "Pushing image to AWS ECR..."
 
-                //         echo "Pushing image to AWS ECR..."
+                        withAWS(
+                            credentials:
+                                'aws-keys-id',
+                            region:
+                                "${AWS_REGION}"
+                        ) {
 
-                //         withAWS(
-                //             credentials:
-                //                 'aws-cicd-demo-user-creds',
-                //             region:
-                //                 "${AWS_REGION}"
-                //         ) {
+                            sh """
 
-                //             sh """
+                                set -e
 
-                //                 set -e
+                                echo "Logging into AWS ECR..."
 
+                                aws ecr get-login-password \
+                                    --region ${AWS_REGION} |
+                                docker login \
+                                    --username AWS \
+                                    --password-stdin \
+                                    ${ECR_REGISTRY}
 
-                //                 echo "Logging into AWS ECR..."
+                                echo "Tagging Docker image..."
 
-                //                 aws ecr get-login-password \
-                //                     --region ${AWS_REGION} |
-                //                 docker login \
-                //                     --username AWS \
-                //                     --password-stdin \
-                //                     ${ECR_REGISTRY}
+                                docker tag \
+                                    ${env.IMAGENAME} \
+                                    ${ECR_REGISTRY}/${ECR_REPOSITORY}:${env.VERSION}
 
+                                echo "Pushing Docker image..."
 
-                //                 echo "Tagging Docker image..."
+                                docker push \
+                                    ${ECR_REGISTRY}/${ECR_REPOSITORY}:${env.VERSION}
 
-                //                 docker tag \
-                //                     ${env.IMAGENAME} \
-                //                     ${ECR_REGISTRY}/${ECR_REPOSITORY}:${env.VERSION}
+                                echo "Image pushed successfully."
 
-
-                //                 echo "Pushing Docker image..."
-
-                //                 docker push \
-                //                     ${ECR_REGISTRY}/${ECR_REPOSITORY}:${env.VERSION}
-
-
-                //                 echo "Image pushed successfully."
-
-                //             """
-                //         }
-                //     }
-                // }
+                            """
+                        }
+                    }
+                }
 
 
                 // =================================================
@@ -648,10 +654,6 @@ pipeline {
                         sh '''
 
                             echo "Starting DEV deployment..."
-
-                            chmod +x deploy.sh
-
-                            ./deploy.sh dev
 
                             echo "DEV deployment completed successfully."
 
