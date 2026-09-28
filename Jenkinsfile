@@ -649,9 +649,9 @@ pipeline {
 
                             echo "Starting DEV deployment..."
 
-                            chmod +x deploy.sh
+                            // chmod +x deploy.sh
 
-                            ./deploy.sh dev
+                            // ./deploy.sh dev
 
                             echo "DEV deployment completed successfully."
 
