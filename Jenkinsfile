@@ -646,6 +646,12 @@ pipeline {
                         expression { env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'main' }
                     }
                     steps {
+                        withAWS(
+                            credentials:
+                                'aws-keys-id',
+                            region:
+                                "${AWS_REGION}"
+                        )
                         sh '''
                             set -eu
                             aws eks update-kubeconfig \
@@ -662,7 +668,12 @@ pipeline {
                     }
 
                     steps {
-
+                        withAWS(
+                            credentials:
+                                'aws-keys-id',
+                            region:
+                                "${AWS_REGION}"
+                        )
                         echo "========================================="
                         echo "DEV DEPLOYMENT"
                         echo "========================================="
@@ -671,7 +682,7 @@ pipeline {
                         echo "Version: ${env.VERSION}"
                         echo "Environment: DEV"
 
-               
+                        
                         sh '''
                             set -eu
                             IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}"
