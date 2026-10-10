@@ -1,0 +1,17 @@
+services:
+
+  api:
+    build: .
+    container_name: task-management-api
+
+    ports:
+      - "8000:8000"
+
+    volumes:
+      - task_data:/app
+
+    restart: unless-stopped
+
+
+volumes:
+  task_data:
