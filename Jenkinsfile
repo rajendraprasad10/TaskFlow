@@ -32,7 +32,6 @@ pipeline {
         // =====================================================
         // AWS ECR
         // =====================================================
-
         AWS_REGION = "ap-south-1"
 
         AWS_ACCOUNT_ID = "928341811849"
@@ -40,6 +39,10 @@ pipeline {
         ECR_REGISTRY = "${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com"
 
         ECR_REPOSITORY = "cicd-taskflow"
+
+        EKS_CLUSTER    = 'taskflow-eks'
+
+        K8S_DEPLOYMENT = 'cicd-taskflow'
 
         // GitHub repository URL
         REPOSITORY_URL = 'https://github.com/rajendraprasad10/TaskFlow.git'
@@ -638,7 +641,25 @@ pipeline {
                 // 4.6 DEV DEPLOYMENT
                 // =================================================
 
+                stage('Configure EKS Access') {
+                    when {
+                        expression { env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'main' }
+                    }
+                    steps {
+                        sh '''
+                            set -eu
+                            aws eks update-kubeconfig \
+                            --region "${AWS_REGION}" \
+                            --name "${EKS_CLUSTER}"
+
+                            kubectl get nodes
+                        '''
+                    }
+                }
                 stage('Deploy DEV') {
+                    when {
+                        expression { env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'main' }
+                    }
 
                     steps {
 
@@ -650,17 +671,28 @@ pipeline {
                         echo "Version: ${env.VERSION}"
                         echo "Environment: DEV"
 
-
+               
                         sh '''
+                            set -eu
+                            IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}"
 
-                            echo "Starting DEV deployment..."
+                            kubectl apply -f k8s/deployment.yaml
+                            kubectl apply -f k8s/service.yaml
 
-                            echo "DEV deployment completed successfully."
+                            kubectl set image \
+                            deployment/${K8S_DEPLOYMENT} \
+                            cicd-taskflow="${IMAGE_URI}"
 
+                            kubectl rollout status \
+                            deployment/${K8S_DEPLOYMENT} \
+                            --timeout=180s
+
+                            kubectl get pods
+                            kubectl get service cicd-taskflow-service
                         '''
                     }
+                    
                 }
-
 
                 // =================================================
                 // 4.7 DEV API TESTS
