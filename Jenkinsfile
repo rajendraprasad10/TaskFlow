@@ -694,16 +694,10 @@ pipeline {
                     }
 
                     steps {
-                        withCredentials([
-                            string(
-                                credentialsId: 'aws-keys-id',
-                                variable: 'AWS_ACCESS_KEY_ID'
-                            ),
-                            string(
-                                credentialsId: 'aws-keys-id',
-                                variable: 'AWS_SECRET_ACCESS_KEY'
-                            )
-                        ])
+                        withAWS(
+                        credentials: 'aws-keys-id',
+                        region: "${AWS_REGION}"
+                        )
                         echo "========================================="
                         echo "DEV DEPLOYMENT"
                         echo "========================================="
