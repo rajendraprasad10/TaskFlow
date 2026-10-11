@@ -707,8 +707,8 @@ pipeline {
 
                             IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}"
 
-                            kubectl apply -f k8s/deployment.yaml
-                            kubectl apply -f k8s/service.yaml
+                            kubectl apply -f k8s/deployment.yml
+                            kubectl apply -f k8s/service.yml
 
                             kubectl set image \
                             deployment/${K8S_DEPLOYMENT} \
