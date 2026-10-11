@@ -695,18 +695,10 @@ pipeline {
 
                     steps {
                         withAWS(
-                        credentials: 'aws-keys-id',
-                        region: "${AWS_REGION}"
-                        )
-                        echo "========================================="
-                        echo "DEV DEPLOYMENT"
-                        echo "========================================="
+                            credentials: 'aws-keys-id',
+                            region: 'ap-south-1'
+                        ) {
 
-                        echo "Application: ${env.APP_NAME}"
-                        echo "Version: ${env.VERSION}"
-                        echo "Environment: DEV"
-
-                        
                         sh '''
                             set -eu
                             
@@ -729,6 +721,7 @@ pipeline {
                             kubectl get pods
                             kubectl get service cicd-taskflow-service
                         '''
+                        }
                     }
                     
                 }
