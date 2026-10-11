@@ -645,19 +645,24 @@ pipeline {
                     when {
                         expression { env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'main' }
                     }
-                    steps {
-                        withAWS(credentials: 'aws-keys-id', region: "${AWS_REGION}")
+                      withAWS(
+                        credentials: 'aws-keys-id',
+                        region: "${AWS_REGION}"
+                    ) {
                         sh '''
                             set -eu
 
                             echo "Checking AWS authentication..."
                             aws sts get-caller-identity
 
+                            echo "Updating EKS kubeconfig..."
                             aws eks update-kubeconfig \
-                            --region "${AWS_REGION}" \
-                            --name "${EKS_CLUSTER}"
+                                --region "$AWS_REGION" \
+                                --name "$EKS_CLUSTER"
 
+                            echo "Checking Kubernetes access..."
                             kubectl get nodes
+                            kubectl get namespaces
                         '''
                     }
                 }
