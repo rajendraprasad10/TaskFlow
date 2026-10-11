@@ -646,16 +646,10 @@ pipeline {
                         expression { env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'main' }
                     }
                     steps {
-                        withCredentials([
-                            string(
-                                credentialsId: 'aws-keys-id',
-                                variable: 'AWS_ACCESS_KEY_ID'
-                            ),
-                            string(
-                                credentialsId: 'aws-keys-id',
-                                variable: 'AWS_SECRET_ACCESS_KEY'
-                            )
-                        ])
+                        withCredentials([[
+                            $class: 'AmazonWebServicesCredentialsBinding',
+                            credentialsId: 'aws-credentials'
+                        ]])
                         sh '''
                             set -eu
 
