@@ -15,7 +15,7 @@ app = FastAPI(
 @app.get("/")
 def root():
     return {
-        "message": "Task Management API",
+        "message": "Task Management API deployed successfully in eks cluster",
         "version": "1.0.0",
     }
 
