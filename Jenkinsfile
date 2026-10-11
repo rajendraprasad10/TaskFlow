@@ -699,7 +699,7 @@ pipeline {
                             region: 'ap-south-1'
                         ) {
 
-                        sh '''
+                        sh """
                             set -eu
                             
                             echo "Checking AWS authentication..."
@@ -720,7 +720,7 @@ pipeline {
 
                             kubectl get pods
                             kubectl get service cicd-taskflow-service
-                        '''
+                        """
                         }
                     }
                     
