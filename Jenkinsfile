@@ -637,6 +637,25 @@ pipeline {
                 }
 
 
+                stage('Diagnose AWS Credentials') {
+                    when {
+                        expression { env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'main' }
+                    }
+                    steps {
+                        withAWS(
+                            credentials: 'aws-keys-id',
+                            region: 'ap-south-1'
+                        ) {
+                            sh '''
+                                env | grep '^AWS_' | sed \
+                                    's/=.*/=<set>/'
+
+                                aws sts get-caller-identity
+                            '''
+                        }
+                    }
+                }
+
                 // =================================================
                 // 4.6 DEV DEPLOYMENT
                 // =================================================
