@@ -646,14 +646,22 @@ pipeline {
                         expression { env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'main' }
                     }
                     steps {
-                        withAWS(
-                            credentials:
-                                'aws-keys-id',
-                            region:
-                                "${AWS_REGION}"
-                        )
+                        withCredentials([
+                            string(
+                                credentialsId: 'aws-keys-id',
+                                variable: 'AWS_ACCESS_KEY_ID'
+                            ),
+                            string(
+                                credentialsId: 'aws-keys-id',
+                                variable: 'AWS_SECRET_ACCESS_KEY'
+                            )
+                        ])
                         sh '''
                             set -eu
+
+                            echo "Checking AWS authentication..."
+                            aws sts get-caller-identity
+
                             aws eks update-kubeconfig \
                             --region "${AWS_REGION}" \
                             --name "${EKS_CLUSTER}"
