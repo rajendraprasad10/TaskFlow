@@ -699,13 +699,13 @@ pipeline {
                             region: 'ap-south-1'
                         ) {
 
-                        sh """
+                        sh '''
                             set -eu
                             
                             echo "Checking AWS authentication..."
                             aws sts get-caller-identity
 
-                            IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${env.VERSION}"
+                            IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${VERSION}"
 
                             kubectl apply -f k8s/deployment.yml
                             kubectl apply -f k8s/service.yml
@@ -720,7 +720,7 @@ pipeline {
 
                             kubectl get pods
                             kubectl get service cicd-taskflow-service
-                        """
+                        '''
                         }
                     }
                     
