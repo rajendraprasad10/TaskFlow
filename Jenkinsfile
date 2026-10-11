@@ -668,12 +668,16 @@ pipeline {
                     }
 
                     steps {
-                        withAWS(
-                            credentials:
-                                'aws-keys-id',
-                            region:
-                                "${AWS_REGION}"
-                        )
+                        withCredentials([
+                            string(
+                                credentialsId: 'aws-keys-id',
+                                variable: 'AWS_ACCESS_KEY_ID'
+                            ),
+                            string(
+                                credentialsId: 'aws-keys-id',
+                                variable: 'AWS_SECRET_ACCESS_KEY'
+                            )
+                        ])
                         echo "========================================="
                         echo "DEV DEPLOYMENT"
                         echo "========================================="
@@ -685,6 +689,10 @@ pipeline {
                         
                         sh '''
                             set -eu
+                            
+                            echo "Checking AWS authentication..."
+                            aws sts get-caller-identity
+
                             IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${BUILD_NUMBER}"
 
                             kubectl apply -f k8s/deployment.yaml
