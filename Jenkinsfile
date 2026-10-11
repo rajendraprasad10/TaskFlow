@@ -664,6 +664,7 @@ pipeline {
                     when {
                         expression { env.BRANCH_NAME == 'develop' || env.BRANCH_NAME == 'main' }
                     }
+                    steps {
                       withAWS(
                         credentials: 'aws-keys-id',
                         region: "${AWS_REGION}"
@@ -684,6 +685,8 @@ pipeline {
                             kubectl get namespaces
                         '''
                     }
+                }
+
                 }
                 stage('Deploy DEV') {
                     when {
