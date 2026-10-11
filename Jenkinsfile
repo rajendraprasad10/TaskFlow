@@ -705,7 +705,7 @@ pipeline {
                             echo "Checking AWS authentication..."
                             aws sts get-caller-identity
 
-                            IMAGE_URI="${ECR_REGISTRY}/${ECR_REPOSITORY}:${env.VERSION}"
+                            IMAGE_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com/${ECR_REPOSITORY}:${env.VERSION}"
 
                             kubectl apply -f k8s/deployment.yml
                             kubectl apply -f k8s/service.yml
